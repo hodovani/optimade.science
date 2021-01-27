@@ -16,6 +16,8 @@ const providers: Asyncable<Types.Provider[]> = asyncable(async (): Promise<Types
 
     retrieveProviderSelections(providers);
 
+    console.log("update")
+
     return providers;
 }, null);
 
@@ -30,22 +32,29 @@ async function retrieveProviderSelections(providers: Types.Provider[]) {
     // move next operations to the next tick to be sure all changes already applied
     await tick();
 
+    let augmentation_mode = false;
+
     const ids = localStorage[lsProviderKey] ?
         JSON.parse(localStorage.getItem(lsProviderKey)) :
         providers.map(p => p.id);
 
-    query.update($query => {
-        if (typeof $query.providers === 'string') {
-            $query.providers = [$query.providers];
-        }
+    console.log(ids)
 
-        $query.providers = $query.providers && $query.providers.length ?
-            $query.providers.filter(id => ids.includes(id)) :
-            ids;
-        return $query;
-    });
+    // query.update($query => {
+    //     if (typeof $query.providers === 'string') {
+    //         $query.providers = [$query.providers];
+    //     }
+
+    //     console.log($query.providers.filter(id => ids.includes(id)))
+
+    //     $query.providers = $query.providers && $query.providers.length ?
+    //         $query.providers.filter(id => ids.includes(id)) :
+    //         ids;
+    //     return $query;
+    // });
 }
 
 query.subscribe($query => {
+    console.log($query.providers)
     $query.providers && localStorage.setItem(lsProviderKey, JSON.stringify($query.providers));
 });
